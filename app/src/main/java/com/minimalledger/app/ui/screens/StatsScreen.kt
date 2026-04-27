@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
@@ -36,7 +35,6 @@ import com.minimalledger.app.utils.formatCurrency
 import com.minimalledger.app.utils.formatMonthDay
 import com.minimalledger.app.utils.formatTime
 import com.minimalledger.app.utils.formatYearMonth
-import com.minimalledger.app.viewmodel.BudgetStatus
 import java.time.YearMonth
 
 @Composable
@@ -44,7 +42,7 @@ fun StatsScreen(
     selectedMonth: YearMonth,
     isCurrentMonth: Boolean,
     summary: MonthlySummary,
-    budgetStatus: BudgetStatus,
+    currentAssetInCents: Long,
     largestExpense: Transaction?,
     weeklyTrend: List<DailyTrendPoint>,
     onPreviousMonth: () -> Unit,
@@ -67,10 +65,6 @@ fun StatsScreen(
             onCurrentMonth = onCurrentMonth,
         )
 
-        BudgetRealtimeCard(
-            budgetStatus = budgetStatus,
-        )
-
         SummaryCard(
             label = "\u6536\u5165",
             value = formatCurrency(summary.incomeInCents),
@@ -82,8 +76,8 @@ fun StatsScreen(
             containerColor = ExpenseRed,
         )
         SummaryCard(
-            label = "\u7ED3\u4F59",
-            value = formatCurrency(summary.balanceInCents),
+            label = "\u5F53\u524D\u5269\u4F59\u603B\u8D44\u4EA7",
+            value = formatCurrency(currentAssetInCents),
             containerColor = MaterialTheme.colorScheme.primary,
         )
 
@@ -114,91 +108,6 @@ fun StatsScreen(
         ) {
             Text("\u5BFC\u51FA CSV")
         }
-    }
-}
-
-@Composable
-private fun BudgetRealtimeCard(
-    budgetStatus: BudgetStatus,
-) {
-    val remainingColor = if (budgetStatus.remainingInCents >= 0L) IncomeGreen else ExpenseRed
-    Card(modifier = Modifier.fillMaxWidth()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(18.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-        ) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(
-                        text = "\u5B9E\u65F6\u9884\u7B97\u7ED3\u4F59",
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                    )
-                    Text(
-                        text = if (budgetStatus.isBudgetSet) {
-                            "\u9884\u7B97\u6765\u81EA\u8D44\u4EA7\u603B\u989D\uFF0C\u5DF2\u7528 ${budgetStatus.usedPercent}%"
-                        } else {
-                            "\u9884\u7B97\u6765\u81EA\u8D44\u4EA7\u603B\u989D"
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f),
-                    )
-                }
-            }
-
-            Text(
-                text = if (budgetStatus.isBudgetSet) {
-                    formatCurrency(budgetStatus.remainingInCents)
-                } else {
-                    formatCurrency(budgetStatus.remainingInCents)
-                },
-                style = MaterialTheme.typography.headlineSmall,
-                color = remainingColor,
-                fontWeight = FontWeight.Black,
-            )
-
-            LinearProgressIndicator(
-                progress = { budgetStatus.progress },
-                modifier = Modifier.fillMaxWidth(),
-                color = remainingColor,
-                trackColor = LedgerBorder,
-            )
-
-            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
-                BudgetMetric(
-                    label = "\u5468\u671F\u8D44\u4EA7",
-                    value = if (budgetStatus.isBudgetSet) formatCurrency(budgetStatus.budgetInCents) else "--",
-                    modifier = Modifier.weight(1f),
-                )
-                BudgetMetric(
-                    label = "\u5DF2\u652F\u51FA",
-                    value = formatCurrency(budgetStatus.expenseInCents),
-                    modifier = Modifier.weight(1f),
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BudgetMetric(
-    label: String,
-    value: String,
-    modifier: Modifier = Modifier,
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f),
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-        )
     }
 }
 

@@ -191,7 +191,7 @@ fun LedgerApp(
                 selectedMonth = uiState.selectedStatsMonth,
                 isCurrentMonth = uiState.isCurrentStatsMonth,
                 summary = uiState.monthlySummary,
-                budgetStatus = uiState.budgetStatus,
+                currentAssetInCents = uiState.assetSummary.assetInCents,
                 largestExpense = uiState.largestExpense,
                 weeklyTrend = uiState.weeklyTrend,
                 onPreviousMonth = viewModel::showPreviousStatsMonth,
